@@ -6,9 +6,16 @@ const {shuffleArray} = require('./utils')
 
 app.use(express.json())
 
-// app.get('/js', (req, res) => {
-//     res.sendFile(path.join(__dirname, '/public/index.js'))
-// })
+// include and initialize the rollbar library with your access token
+var Rollbar = require('rollbar')
+var rollbar = new Rollbar({
+  accessToken: 'beac5eb37a3040dc9a3c3981d979061f',
+  captureUncaught: true,
+  captureUnhandledRejections: true,
+})
+
+// record a generic message and send it to Rollbar
+rollbar.log('Hello world!')
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'))
@@ -20,7 +27,7 @@ app.get('/js', (req, res) => {
 
 app.get('/styles', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.css'))
-    // rollbar.info('css file served')
+    rollbar.info('css file served')
 })
 
 
@@ -86,6 +93,8 @@ app.get('/api/player', (req, res) => {
 })
 
 const port = process.env.PORT || 3000
+
+app.use(rollbar.errorHandler())
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}`)
